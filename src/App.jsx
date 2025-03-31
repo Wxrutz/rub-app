@@ -1,14 +1,20 @@
 import React from "react";
 import UploadImage from "./Component/UploadImage";
 
-
 function App() {
+  const background = "url('/assets/rubber1.jpg')";
+
   return (
-    <div className="" 
-    style={{ backgroundImage: "url('public/assets/rubber2.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
-     
-        <UploadImage />
-      
+    <div
+      className=""
+      style={{
+        backgroundImage: background,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        minHeight: "100vh"
+      }}
+    >
+      <UploadImage />
     </div>
   );
 }

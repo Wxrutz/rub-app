@@ -1,13 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function UploadImage() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [result, setResult] = useState('');
-  const [accuracy, setAccuracy] = useState(null); // Added state for accuracy
+  const [accuracy, setAccuracy] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [showErrorPopup, setShowErrorPopup] = useState(false);
+  const [bgIndex, setBgIndex] = useState(0); // State for background index
+
+  const backgrounds = [
+    'url("/path/to/bg1.jpg")',
+    'url("/path/to/bg2.jpg")',
+    'url("/path/to/bg3.jpg")',
+  ]; // Array of background images
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setBgIndex((prevIndex) => (prevIndex + 1) % backgrounds.length);
+    }, 10000); // Change background every 10 seconds
+    return () => clearInterval(interval);
+  }, [backgrounds.length]);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -19,6 +33,23 @@ function UploadImage() {
     setSelectedFile(file);
     setShowErrorPopup(false);
     setPreview(URL.createObjectURL(file));
+  };
+
+  const handleDrop = (event) => {
+    event.preventDefault();
+    const file = event.dataTransfer.files[0];
+    if (!file) {
+      setSelectedFile(null);
+      setPreview(null);
+      return;
+    }
+    setSelectedFile(file);
+    setShowErrorPopup(false);
+    setPreview(URL.createObjectURL(file));
+  };
+
+  const handleDragOver = (event) => {
+    event.preventDefault();
   };
 
   const handleUpload = async () => {
@@ -54,18 +85,25 @@ function UploadImage() {
       setShowPopup(true);
     }
   };
+
   const refreshPage = () => {
     window.location.reload();
   };
 
   return (
-    <div className="main-container">
+    <div
+      className="main-container"
+      style={{ backgroundImage: backgrounds[bgIndex] }} // Dynamic background
+    >
       <div className="background-overlay"></div>
       <div className="hero">
-        <h1>การจำแนกอายุยางพารา</h1>
+        <h1 className="typing-effect">การจำแนกอายุยางพารา</h1> {/* Added typing-effect class */}
       </div>
-      <main className="upload-container">
-        
+      <main
+        className="upload-container"
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+      >
         <input
           type="file"
           accept="image/*"
@@ -86,23 +124,23 @@ function UploadImage() {
 
       {/* Popup for result */}
       {showPopup && (
-        <div className="popup-overlay">
+        <div className={`popup-overlay ${showPopup ? 'active' : ''}`}>
           <div className="popup-content">
             <h2>ผลลัพธ์การจำแนก</h2>
             <p>สวนยางพาราสวนนี้อายุประมาณ: {result} ปี</p>
             {accuracy !== null && <p>ความแม่นยำ: {accuracy.toFixed(2)}%</p>} {/* Display accuracy */}
-            <button onClick={() => setShowPopup(false)}>ปิด</button>
+            <button onClick={() => { setShowPopup(false); refreshPage(); }}>ปิด</button>
           </div>
         </div>
       )}
 
       {/* Popup for error */}
       {showErrorPopup && (
-        <div className="popup-overlay">
+        <div className={`popup-overlay ${showErrorPopup ? 'active' : ''}`}>
           <div className="popup-content">
             <h2>ข้อผิดพลาด</h2>
             <p>กรุณาเลือกรูปภาพก่อน!</p>
-            <button onClick={() => setShowErrorPopup(false)}>ปิด</button>
+            <button onClick={() => { setShowErrorPopup(false); refreshPage(); }}>ปิด</button>
           </div>
         </div>
       )}
