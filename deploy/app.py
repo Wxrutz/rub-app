@@ -11,7 +11,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Load the model
-model = load_model('./models/test01RMS_mobilenet.keras')
+model = load_model('./models/test1RMS_mobilenet.keras')
 
 @app.route('/predict', methods=['POST'])
 def predict():
